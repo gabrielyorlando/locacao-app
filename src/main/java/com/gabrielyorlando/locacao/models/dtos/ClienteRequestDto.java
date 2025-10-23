@@ -2,10 +2,10 @@ package com.gabrielyorlando.locacao.models.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.br.CPF;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ public class ClienteRequestDto {
     private String nome;
 
     @NotBlank
-    @Email
+    @Email(message = "Email inválido")
     @Size(max = 150)
     private String email;
 
@@ -24,6 +24,6 @@ public class ClienteRequestDto {
     private String telefone;
 
     @NotBlank
-    @Pattern(regexp = "\\d{11}", message = "CPF deve ter 11 dígitos numéricos")
+    @CPF(message = "CPF inválido")
     private String cpf;
 }

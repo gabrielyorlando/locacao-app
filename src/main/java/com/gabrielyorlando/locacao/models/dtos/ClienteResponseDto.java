@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ClienteResponseDto {
-    private Integer id;
+    private Long id;
     private String nome;
     private String email;
     private String telefone;

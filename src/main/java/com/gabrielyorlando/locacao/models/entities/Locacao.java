@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Locacao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id = 0L;
     @Column(nullable = false)
     private String nome;
     @Enumerated(EnumType.STRING)
