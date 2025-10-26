@@ -30,6 +30,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("Recurso não encontrado", ex.getMessage(), request.getRequestURI());
     }
 
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(BusinessRuleException.class)
+    public Map<String, Object> handleBusinessRuleException(Exception ex, HttpServletRequest request) {
+        return buildErrorResponse("Erro de regra de negócio", ex.getMessage(), request.getRequestURI());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public Map<String, Object> handleGeneralError(Exception ex, HttpServletRequest request) {

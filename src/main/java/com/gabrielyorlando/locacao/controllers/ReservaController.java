@@ -2,10 +2,12 @@ package com.gabrielyorlando.locacao.controllers;
 
 import com.gabrielyorlando.locacao.models.dtos.ReservaRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.ReservaResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.ReservaUpdateRequestDto;
 import com.gabrielyorlando.locacao.services.ReservaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,13 +39,12 @@ public class ReservaController {
 
 	@ResponseStatus(HttpStatus.OK)
 	@PutMapping("/{id}")
-	public ReservaResponseDto update(@PathVariable Long id, @RequestBody @Valid ReservaRequestDto requestDto) {
+	public ReservaResponseDto update(@PathVariable Long id, @RequestBody ReservaUpdateRequestDto requestDto) {
 		return reservaService.update(id, requestDto);
 	}
 
-	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id) {
-		reservaService.delete(id);
+	public ResponseEntity<?> delete(@PathVariable Long id) {
+		return reservaService.delete(id);
 	}
 }

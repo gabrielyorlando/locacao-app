@@ -5,6 +5,7 @@ import com.gabrielyorlando.locacao.exceptions.EntityNotFoundException;
 import com.gabrielyorlando.locacao.mappers.ReservaMapper;
 import com.gabrielyorlando.locacao.models.dtos.ReservaRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.ReservaResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.ReservaUpdateRequestDto;
 import com.gabrielyorlando.locacao.models.entities.Locacao;
 import com.gabrielyorlando.locacao.models.entities.Reserva;
 import com.gabrielyorlando.locacao.models.enums.SituacaoReserva;
@@ -12,96 +13,156 @@ import com.gabrielyorlando.locacao.repositories.ClienteRepository;
 import com.gabrielyorlando.locacao.repositories.LocacaoRepository;
 import com.gabrielyorlando.locacao.repositories.ReservaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class ReservaService {
-	private final ReservaRepository reservaRepository;
-	private final ReservaMapper reservaMapper;
-	private final LocacaoRepository locacaoRepository;
-	private final ClienteRepository clienteRepository;
+    private final ReservaRepository reservaRepository;
+    private final ReservaMapper reservaMapper;
+    private final LocacaoRepository locacaoRepository;
+    private final ClienteRepository clienteRepository;
 
-	public ReservaResponseDto save(ReservaRequestDto requestDto) {
-		if(!requestDto.getDataFim().isAfter(requestDto.getDataInicio())) {
-			throw new BusinessRuleException("A data final deve ser após a data inicial");
-		}
+    public ReservaResponseDto save(ReservaRequestDto requestDto) {
+        validateDateRange(requestDto.getDataInicio(), requestDto.getDataFim());
 
-		//-------> passar esse código de validação todo pra um único bloco q valida tudo---------
-		Locacao locacao = findLocacao(requestDto.getLocacaoId());
-		validateClient(requestDto.getClienteId());
-		Duration duracao = Duration.between(requestDto.getDataInicio(), requestDto.getDataFim());
-		long horas = duracao.toHours();
-		validateHours(horas, locacao.getTempoMinimo(), locacao.getTempoMaximo());
-		validateLocacaoAvailable(locacao, requestDto);
+        long minutes = calculateMinutes(requestDto.getDataInicio(), requestDto.getDataFim());
+        Locacao locacao = validateNewReservation(requestDto, minutes);
 
-		//SALVAMENTO DA RESERVA AQ EMBAIXO
-		Reserva reserva = reservaMapper.toEntity(requestDto);
-		reserva.setSituacao(SituacaoReserva.CONFIRMADA);
-		BigDecimal valorFinal = locacao.getValorHora().multiply(BigDecimal.valueOf(horas));
-		reserva.setValorFinal(valorFinal);
+        Reserva saved = saveReserva(requestDto, locacao, minutes);
+        return reservaMapper.toResponseDTO(saved);
+    }
 
-		Reserva saved = reservaRepository.save(reserva);
-		return reservaMapper.toResponseDTO(saved);
-	}
+    private Reserva saveReserva(ReservaRequestDto request, Locacao locacao, long minutes) {
+        Reserva reserva = reservaMapper.toEntity(request);
+        reserva.setSituacao(SituacaoReserva.CONFIRMADA);
+        BigDecimal total = returnTotal(locacao, minutes);
+        reserva.setValorFinal(total);
+        return reservaRepository.save(reserva);
+    }
 
-	@Transactional(readOnly=true)
-	public ReservaResponseDto findById(Long id) {
-		Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
-		return reservaMapper.toResponseDTO(reserva);
-	}
+    private BigDecimal returnTotal(Locacao locacao, long minutes) {
+        // Cálculo proporcional: meu request recebe horas porque é mais prático mas faço o calculo por minuto para evitar perda de valor em reservas parciais
 
-	@Transactional(readOnly=true)
-	public List<ReservaResponseDto> findAll() {
-		return reservaRepository.findAll().stream().map(reservaMapper::toResponseDTO).toList();
-	}
+        return locacao.getValorHora()
+                .multiply(BigDecimal.valueOf(minutes))
+                .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+    }
 
-	public ReservaResponseDto update(Long id, ReservaRequestDto requestDto) {
-		Reserva reservaExistente = reservaRepository.findById(id)
-		                                            .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+    @Transactional(readOnly = true)
+    public ReservaResponseDto findById(Long id) {
+        Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+        return reservaMapper.toResponseDTO(reserva);
+    }
 
-		//revalidar as mesmas coisas do save
-		reservaMapper.updateEntity(requestDto, reservaExistente);
+    @Transactional(readOnly = true)
+    public List<ReservaResponseDto> findAll() {
+        return reservaRepository.findAll().stream().map(reservaMapper::toResponseDTO).toList();
+    }
 
-		Reserva updated = reservaRepository.save(reservaExistente);
-		return reservaMapper.toResponseDTO(updated);
-	}
+    private void validateLocacaoAvailable(Locacao locacao,
+                                          LocalDateTime inicio,
+                                          LocalDateTime fim,
+                                          Long ignoreReservaId) {
 
-	public void delete(Long id) {
-		if(!reservaRepository.existsById(id)) {
-			throw new EntityNotFoundException("Reserva não encontrada");
-		}
-		reservaRepository.deleteById(id);
-	}
+        boolean existConflict = reservaRepository.existsConflictExcludingSelf(locacao.getId(), inicio, fim, SituacaoReserva.CONFIRMADA, ignoreReservaId);
 
-	private Locacao findLocacao(Long id) {
-		return locacaoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Locação não encontrada"));
-	}
+        if (existConflict) {
+            throw new BusinessRuleException("Já existe outra reserva neste período para essa locação");
+        }
+    }
 
-	private void validateClient(Long id) {
-		clienteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
-	}
+    public ReservaResponseDto update(Long id, ReservaUpdateRequestDto requestDto) {
+        Reserva existing = reservaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
 
-	private void validateHours(long horas, int locacaoTempoMin, int locacaoTempoMax) {
-		if(horas < locacaoTempoMin) {
-			throw new BusinessRuleException("A duração da reserva é menor que o tempo mínimo permitido (" + locacaoTempoMin+ " h)");
-		}
-		if(horas > locacaoTempoMax) {
-			throw new BusinessRuleException("A duração da reserva é maior que o tempo máximo permitido (" + locacaoTempoMax+ " h)");
-		}
-	}
+        validateDateRange(requestDto.getDataInicio(), requestDto.getDataFim());
 
-	private void validateLocacaoAvailable(Locacao locacao, ReservaRequestDto requestDto) {
-		List<Reserva> conflitos = reservaRepository.findReservaConflicts(locacao.getId(), requestDto.getDataInicio(), requestDto.getDataFim(),
-		                                                                 SituacaoReserva.CONFIRMADA);
+        long minutes = calculateMinutes(requestDto.getDataInicio(), requestDto.getDataFim());
+        Locacao locacao = validateReservationUpdate(existing, requestDto, minutes);
 
-		if(!conflitos.isEmpty()) {
-			throw new BusinessRuleException("Já existe uma reserva confirmada para este período");
-		}
-	}
+        existing.setDataInicio(requestDto.getDataInicio());
+        existing.setDataFim(requestDto.getDataFim());
+
+        BigDecimal total = returnTotal(locacao, minutes);
+        existing.setValorFinal(total);
+
+        Reserva updated = reservaRepository.save(existing);
+        return reservaMapper.toResponseDTO(updated);
+    }
+
+    @Transactional
+    public ResponseEntity<?> delete(Long id) {
+        Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+
+        if (reserva.getSituacao() == SituacaoReserva.CONFIRMADA) {
+            reservaRepository.updateSituacao(SituacaoReserva.CANCELADA, id);
+            return ResponseEntity.ok("Reserva cancelada com sucesso");
+        }
+
+        reservaRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    private Locacao findLocacao(Long id) {
+        return locacaoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Locação não encontrada"));
+    }
+
+    private void validateClient(Long id) {
+        clienteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+    }
+
+    private void validateDuration(long minutes, int minHours, int maxHours) {
+        long minMinutes = minHours * 60L;
+        long maxMinutes = maxHours * 60L;
+
+        if (minutes < minMinutes) {
+            throw new BusinessRuleException(String.format("A duração mínima da reserva é de %d horas.", minHours));
+        }
+
+        if (minutes > maxMinutes) {
+            throw new BusinessRuleException(String.format("A duração máxima da reserva é de %d horas.", maxHours));
+        }
+    }
+
+    private void validateLocacaoAvailable(Locacao locacao, ReservaRequestDto requestDto) {
+        boolean existConflict = reservaRepository.existsConflict(locacao.getId(), requestDto.getDataInicio(), requestDto.getDataFim(), SituacaoReserva.CONFIRMADA);
+
+        if (existConflict) {
+            throw new BusinessRuleException("Já existe uma reserva confirmada para este período");
+        }
+    }
+
+    private void validateDateRange(LocalDateTime start, LocalDateTime end) {
+        if (end.isBefore(start)) {
+            throw new BusinessRuleException("A data/hora final deve ser após a data inicial");
+        }
+    }
+
+    private long calculateMinutes(LocalDateTime start, LocalDateTime end) {
+        return Duration.between(start, end).toMinutes();
+    }
+
+    private Locacao validateNewReservation(ReservaRequestDto request, long minutes) {
+        Locacao locacao = findLocacao(request.getLocacaoId());
+        validateClient(request.getClienteId());
+        validateDuration(minutes, locacao.getTempoMinimo(), locacao.getTempoMaximo());
+        validateLocacaoAvailable(locacao, request);
+        return locacao;
+    }
+
+    private Locacao validateReservationUpdate(Reserva existing, ReservaUpdateRequestDto request, long minutes) {
+        Locacao locacao = existing.getLocacao();
+        validateDuration(minutes, locacao.getTempoMinimo(), locacao.getTempoMaximo());
+        validateLocacaoAvailable(locacao, request.getDataInicio(), request.getDataFim(), existing.getId());
+        return locacao;
+    }
 }
