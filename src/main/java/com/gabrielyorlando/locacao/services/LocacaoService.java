@@ -2,8 +2,8 @@ package com.gabrielyorlando.locacao.services;
 
 import com.gabrielyorlando.locacao.exceptions.EntityNotFoundException;
 import com.gabrielyorlando.locacao.mappers.LocacaoMapper;
-import com.gabrielyorlando.locacao.models.dtos.LocacaoRequestDto;
-import com.gabrielyorlando.locacao.models.dtos.LocacaoResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoRequestDto;
+import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoResponseDto;
 import com.gabrielyorlando.locacao.models.entities.Locacao;
 import com.gabrielyorlando.locacao.repositories.LocacaoRepository;
 import lombok.RequiredArgsConstructor;

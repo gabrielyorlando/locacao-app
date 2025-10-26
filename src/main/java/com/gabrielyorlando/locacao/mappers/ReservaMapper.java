@@ -1,11 +1,10 @@
 package com.gabrielyorlando.locacao.mappers;
 
-import com.gabrielyorlando.locacao.models.dtos.ReservaRequestDto;
-import com.gabrielyorlando.locacao.models.dtos.ReservaResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.reserva.ReservaRequestDto;
+import com.gabrielyorlando.locacao.models.dtos.reserva.ReservaResponseDto;
 import com.gabrielyorlando.locacao.models.entities.Reserva;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel="spring")
 public interface ReservaMapper {

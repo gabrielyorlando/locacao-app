@@ -1,7 +1,7 @@
 package com.gabrielyorlando.locacao.mappers;
 
-import com.gabrielyorlando.locacao.models.dtos.LocacaoRequestDto;
-import com.gabrielyorlando.locacao.models.dtos.LocacaoResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoRequestDto;
+import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoResponseDto;
 import com.gabrielyorlando.locacao.models.entities.Locacao;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

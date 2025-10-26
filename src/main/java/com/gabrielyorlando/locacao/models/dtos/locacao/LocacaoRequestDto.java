@@ -1,4 +1,4 @@
-package com.gabrielyorlando.locacao.models.dtos;
+package com.gabrielyorlando.locacao.models.dtos.locacao;
 
 import com.gabrielyorlando.locacao.models.enums.TipoLocacao;
 import jakarta.validation.constraints.NotBlank;

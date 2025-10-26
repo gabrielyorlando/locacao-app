@@ -1,4 +1,4 @@
-package com.gabrielyorlando.locacao.models.dtos;
+package com.gabrielyorlando.locacao.models.dtos.reserva;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gabrielyorlando.locacao.models.enums.SituacaoReserva;

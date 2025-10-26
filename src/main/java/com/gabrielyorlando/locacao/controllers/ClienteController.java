@@ -1,7 +1,7 @@
 package com.gabrielyorlando.locacao.controllers;
 
-import com.gabrielyorlando.locacao.models.dtos.ClienteRequestDto;
-import com.gabrielyorlando.locacao.models.dtos.ClienteResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteRequestDto;
+import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteResponseDto;
 import com.gabrielyorlando.locacao.services.ClienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

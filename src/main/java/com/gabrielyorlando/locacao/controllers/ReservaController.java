@@ -1,8 +1,8 @@
 package com.gabrielyorlando.locacao.controllers;
 
-import com.gabrielyorlando.locacao.models.dtos.ReservaRequestDto;
-import com.gabrielyorlando.locacao.models.dtos.ReservaResponseDto;
-import com.gabrielyorlando.locacao.models.dtos.ReservaUpdateRequestDto;
+import com.gabrielyorlando.locacao.models.dtos.reserva.ReservaRequestDto;
+import com.gabrielyorlando.locacao.models.dtos.reserva.ReservaResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.reserva.ReservaUpdateRequestDto;
 import com.gabrielyorlando.locacao.services.ReservaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

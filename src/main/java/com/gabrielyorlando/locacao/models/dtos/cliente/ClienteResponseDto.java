@@ -1,4 +1,4 @@
-package com.gabrielyorlando.locacao.models.dtos;
+package com.gabrielyorlando.locacao.models.dtos.cliente;
 
 import lombok.Getter;
 import lombok.Setter;
