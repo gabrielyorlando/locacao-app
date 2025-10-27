@@ -15,7 +15,7 @@ public class LocacaoResponseDto {
 	private TipoLocacao tipo;
 	private String descricao;
 	private BigDecimal valorHora;
-	private Integer tempoMinimo;
-	private Integer tempoMaximo;
+	private Integer tempoMinimoHoras;
+	private Integer tempoMaximoHoras;
 	private LocalDateTime dataCriacao;
 }

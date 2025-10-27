@@ -23,8 +23,8 @@ public class LocacaoRequestDto {
 	private BigDecimal valorHora;
 
 	@NotNull(message="O tempo mínimo é obrigatório (em horas)")
-	private Integer tempoMinimo;
+	private Integer tempoMinimoHoras;
 
 	@NotNull(message="O tempo máximo é obrigatório (em horas)")
-	private Integer tempoMaximo;
+	private Integer tempoMaximoHoras;
 }

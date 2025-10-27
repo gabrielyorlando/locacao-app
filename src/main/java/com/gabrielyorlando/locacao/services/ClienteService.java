@@ -1,11 +1,13 @@
 package com.gabrielyorlando.locacao.services;
 
+import com.gabrielyorlando.locacao.exceptions.BusinessRuleException;
 import com.gabrielyorlando.locacao.exceptions.EntityNotFoundException;
 import com.gabrielyorlando.locacao.mappers.ClienteMapper;
 import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteResponseDto;
 import com.gabrielyorlando.locacao.models.entities.Cliente;
 import com.gabrielyorlando.locacao.repositories.ClienteRepository;
+import com.gabrielyorlando.locacao.repositories.ReservaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import java.util.List;
 @Service
 public class ClienteService {
     private final ClienteRepository clienteRepository;
+    private final ReservaRepository reservaRepository;
     private final ClienteMapper clienteMapper;
 
     public ClienteResponseDto save(ClienteRequestDto requestDto) {
@@ -50,6 +53,9 @@ public class ClienteService {
     public void delete(Long id) {
         if (!clienteRepository.existsById(id)) {
             throw new EntityNotFoundException("Cliente não encontrado");
+        }
+        if (reservaRepository.existsByClienteId(id)) {
+            throw new BusinessRuleException("Não é possível excluir o cliente pois existem outros registros vinculados a ele.");
         }
         clienteRepository.deleteById(id);
     }

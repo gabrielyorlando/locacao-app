@@ -1,21 +1,27 @@
 package com.gabrielyorlando.locacao.services;
 
+import com.gabrielyorlando.locacao.exceptions.BusinessRuleException;
 import com.gabrielyorlando.locacao.exceptions.EntityNotFoundException;
 import com.gabrielyorlando.locacao.mappers.LocacaoMapper;
 import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoResponseDto;
 import com.gabrielyorlando.locacao.models.entities.Locacao;
 import com.gabrielyorlando.locacao.repositories.LocacaoRepository;
+import com.gabrielyorlando.locacao.repositories.ReservaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class LocacaoService {
 	private final LocacaoRepository locacaoRepository;
+	private final ReservaRepository reservaRepository;
 	private final LocacaoMapper locacaoMapper;
 
 	public LocacaoResponseDto save(LocacaoRequestDto requestDto) {
@@ -36,6 +42,12 @@ public class LocacaoService {
 		return locacaoRepository.findAll().stream().map(locacaoMapper::toResponseDTO).toList();
 	}
 
+	@Transactional(readOnly = true)
+	public Page<LocacaoResponseDto> findAvailableBetweenDates(LocalDateTime start, LocalDateTime end, Pageable pageable) {
+		Page<Locacao> page = locacaoRepository.findAvailableByDateRangeAndSituacaoReservaConfirmada(start, end, pageable);
+		return page.map(locacaoMapper::toResponseDTO);
+	}
+
 	public LocacaoResponseDto update(Long id, LocacaoRequestDto requestDto) {
 		Locacao locacaoExistente = locacaoRepository.findById(id)
 		                                            .orElseThrow(() -> new EntityNotFoundException("Locação não encontrada"));
@@ -50,6 +62,10 @@ public class LocacaoService {
 		if(!locacaoRepository.existsById(id)) {
 			throw new EntityNotFoundException("Locação não encontrada");
 		}
+		if (reservaRepository.existsByLocacaoId(id)) {
+			throw new BusinessRuleException("Não é possível excluir a locação pois existem outros registros vinculados a ela.");
+		}
 		locacaoRepository.deleteById(id);
 	}
+
 }

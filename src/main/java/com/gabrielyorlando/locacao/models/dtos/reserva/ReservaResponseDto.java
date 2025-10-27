@@ -19,6 +19,6 @@ public class ReservaResponseDto {
 	private BigDecimal valorFinal;
 	private SituacaoReserva situacao;
 	private LocalDateTime dataCriacao;
-	private String clienteNome;
-	private String locacaoNome;
+	private Long clienteId;
+	private Long locacaoId;
 }

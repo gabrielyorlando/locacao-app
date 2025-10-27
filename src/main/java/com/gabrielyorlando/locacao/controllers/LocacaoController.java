@@ -5,9 +5,13 @@ import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoResponseDto;
 import com.gabrielyorlando.locacao.services.LocacaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -32,6 +36,12 @@ public class LocacaoController {
 	@GetMapping
 	public List<LocacaoResponseDto> getAll() {
 		return locacaoService.findAll();
+	}
+
+	@GetMapping("/availables")
+	public Page<LocacaoResponseDto> findAllAvailable(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+													 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end, Pageable pageable) {
+		return locacaoService.findAvailableBetweenDates(start, end, pageable);
 	}
 
 	@ResponseStatus(HttpStatus.OK)

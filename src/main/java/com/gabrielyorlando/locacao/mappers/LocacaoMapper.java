@@ -12,11 +12,17 @@ public interface LocacaoMapper {
 
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "dataCriacao", ignore = true)
+	@Mapping(source = "tempoMinimoHoras", target = "tempoMinimo")
+	@Mapping(source = "tempoMaximoHoras", target = "tempoMaximo")
 	Locacao toEntity(LocacaoRequestDto requestDTO);
 
+	@Mapping(source = "tempoMinimo", target = "tempoMinimoHoras")
+	@Mapping(source = "tempoMaximo", target = "tempoMaximoHoras")
 	@Mapping(source = "dataCriacao", target = "dataCriacao")
 	LocacaoResponseDto toResponseDTO(Locacao locacao);
 
+	@Mapping(source = "tempoMinimoHoras", target = "tempoMinimo")
+	@Mapping(source = "tempoMaximoHoras", target = "tempoMaximo")
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "dataCriacao", ignore = true)
 	void updateEntity(LocacaoRequestDto requestDTO, @MappingTarget Locacao locacao);

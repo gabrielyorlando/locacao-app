@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public Map<String, Object> handleGeneralError(Exception ex, HttpServletRequest request) {
-        log.error("Erro inesperado na requisição: {}", request.getRequestURI(), ex);
+        log.error("Erro inesperado: {} - Path: {}", ex.getMessage(), request.getRequestURI());
         return buildErrorResponse("Erro interno no servidor", "Ocorreu um erro inesperado. Tente novamente mais tarde.", request.getRequestURI());
     }
 

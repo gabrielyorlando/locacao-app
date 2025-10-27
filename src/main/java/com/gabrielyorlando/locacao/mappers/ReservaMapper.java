@@ -16,7 +16,7 @@ public interface ReservaMapper {
 	@Mapping(target="dataCriacao", ignore=true)
 	Reserva toEntity(ReservaRequestDto requestDTO);
 
-	@Mapping(source="cliente.nome", target="clienteNome")
-	@Mapping(source="locacao.nome", target="locacaoNome")
+	@Mapping(source="cliente.id", target="clienteId")
+	@Mapping(source="locacao.id", target="locacaoId")
 	ReservaResponseDto toResponseDTO(Reserva reserva);
 }
