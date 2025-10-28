@@ -34,6 +34,9 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.6")
     implementation("org.springframework.security:spring-security-oauth2-jose:6.5.6")
 
+    // implementation("org.flywaydb:flyway-core")
+    // implementation("org.flywaydb:flyway-mysql")
+
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
@@ -44,11 +47,15 @@ dependencies {
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.2.0")
 
+    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.assertj:assertj-core:3.25.3")
 
-    // implementation("org.flywaydb:flyway-core")
-    // implementation("org.flywaydb:flyway-mysql")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.mockito", module = "mockito-core")
+    }
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Test> {
