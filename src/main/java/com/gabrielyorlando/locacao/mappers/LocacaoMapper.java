@@ -2,12 +2,12 @@ package com.gabrielyorlando.locacao.mappers;
 
 import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoUpdateRequestDto;
 import com.gabrielyorlando.locacao.models.entities.Locacao;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
+		nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface LocacaoMapper {
 
 	@Mapping(target = "id", ignore = true)
@@ -25,5 +25,5 @@ public interface LocacaoMapper {
 	@Mapping(source = "tempoMaximoHoras", target = "tempoMaximo")
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "dataCriacao", ignore = true)
-	void updateEntity(LocacaoRequestDto requestDTO, @MappingTarget Locacao locacao);
+	void updateEntity(LocacaoUpdateRequestDto requestDTO, @MappingTarget Locacao locacao);
 }

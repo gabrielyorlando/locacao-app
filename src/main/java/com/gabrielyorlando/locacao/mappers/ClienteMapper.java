@@ -2,12 +2,13 @@ package com.gabrielyorlando.locacao.mappers;
 
 import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteUpdateRequestDto;
 import com.gabrielyorlando.locacao.models.entities.Cliente;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ClienteMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -18,5 +19,5 @@ public interface ClienteMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "dataCriacao", ignore = true)
-    void updateEntity(ClienteRequestDto requestDto, @MappingTarget Cliente cliente);
+    void updateEntity(ClienteUpdateRequestDto requestDto, @MappingTarget Cliente cliente);
 }

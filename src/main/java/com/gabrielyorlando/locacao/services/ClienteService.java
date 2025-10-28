@@ -5,6 +5,7 @@ import com.gabrielyorlando.locacao.exceptions.EntityNotFoundException;
 import com.gabrielyorlando.locacao.mappers.ClienteMapper;
 import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteUpdateRequestDto;
 import com.gabrielyorlando.locacao.models.entities.Cliente;
 import com.gabrielyorlando.locacao.repositories.ClienteRepository;
 import com.gabrielyorlando.locacao.repositories.ReservaRepository;
@@ -40,7 +41,7 @@ public class ClienteService {
     }
 
 
-    public ClienteResponseDto update(Long id, ClienteRequestDto requestDto) {
+    public ClienteResponseDto update(Long id, ClienteUpdateRequestDto requestDto) {
         Cliente clienteExistente = clienteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 

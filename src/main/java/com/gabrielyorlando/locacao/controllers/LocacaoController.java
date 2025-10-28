@@ -2,6 +2,7 @@ package com.gabrielyorlando.locacao.controllers;
 
 import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoUpdateRequestDto;
 import com.gabrielyorlando.locacao.services.LocacaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class LocacaoController {
 
 	@ResponseStatus(HttpStatus.OK)
 	@PutMapping("/{id}")
-	public LocacaoResponseDto update(@PathVariable Long id, @RequestBody @Valid LocacaoRequestDto requestDto) {
+	public LocacaoResponseDto update(@PathVariable Long id, @RequestBody @Valid LocacaoUpdateRequestDto requestDto) {
 		return locacaoService.update(id, requestDto);
 	}
 

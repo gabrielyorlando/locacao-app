@@ -2,6 +2,7 @@ package com.gabrielyorlando.locacao.controllers;
 
 import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.cliente.ClienteUpdateRequestDto;
 import com.gabrielyorlando.locacao.services.ClienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class ClienteController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public ClienteResponseDto update(@PathVariable Long id, @RequestBody @Valid ClienteRequestDto requestDto) {
+    public ClienteResponseDto update(@PathVariable Long id, @RequestBody @Valid ClienteUpdateRequestDto requestDto) {
         return clienteService.update(id, requestDto);
 
     }

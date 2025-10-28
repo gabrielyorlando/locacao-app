@@ -26,6 +26,6 @@ public class AuthController {
         String token = authService.authenticate(authentication);
         return ResponseEntity.ok(new LoginResponse(token));
     }
-
+    //TODO: AJUSTAR ERRO 500 QUANDO USUARIO TA INVALIDO
     //TODO: NO FLYWAY CRIAR USUARIO PADRAO COM SENHA CRIPTOGRAFADA
 }

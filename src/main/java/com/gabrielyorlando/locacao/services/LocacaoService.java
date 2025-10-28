@@ -5,6 +5,7 @@ import com.gabrielyorlando.locacao.exceptions.EntityNotFoundException;
 import com.gabrielyorlando.locacao.mappers.LocacaoMapper;
 import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoRequestDto;
 import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoResponseDto;
+import com.gabrielyorlando.locacao.models.dtos.locacao.LocacaoUpdateRequestDto;
 import com.gabrielyorlando.locacao.models.entities.Locacao;
 import com.gabrielyorlando.locacao.repositories.LocacaoRepository;
 import com.gabrielyorlando.locacao.repositories.ReservaRepository;
@@ -48,7 +49,7 @@ public class LocacaoService {
 		return page.map(locacaoMapper::toResponseDTO);
 	}
 
-	public LocacaoResponseDto update(Long id, LocacaoRequestDto requestDto) {
+	public LocacaoResponseDto update(Long id, LocacaoUpdateRequestDto requestDto) {
 		Locacao locacaoExistente = locacaoRepository.findById(id)
 		                                            .orElseThrow(() -> new EntityNotFoundException("Locação não encontrada"));
 
