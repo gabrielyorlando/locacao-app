@@ -3,6 +3,7 @@ package com.gabrielyorlando.locacao.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,6 +35,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessRuleException.class)
     public Map<String, Object> handleBusinessRuleException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse("Erro de regra de negócio", ex.getMessage(), request.getRequestURI());
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(BadCredentialsException.class)
+    public Map<String, Object> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
+        return buildErrorResponse("Credenciais inválidas", "Usuário ou senha incorretos", request.getRequestURI());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
