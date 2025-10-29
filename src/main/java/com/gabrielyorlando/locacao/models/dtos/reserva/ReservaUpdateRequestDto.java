@@ -14,5 +14,4 @@ public class ReservaUpdateRequestDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime dataFim;
-    //TODO VERIFICAR O SERVICE PRA EDITAR SÓ SE NAO FOR NULO
 }

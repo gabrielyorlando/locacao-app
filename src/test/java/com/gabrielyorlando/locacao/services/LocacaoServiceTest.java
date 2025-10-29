@@ -1,4 +1,5 @@
 package com.gabrielyorlando.locacao.services;
+
 import com.gabrielyorlando.locacao.exceptions.BusinessRuleException;
 import com.gabrielyorlando.locacao.exceptions.EntityNotFoundException;
 import com.gabrielyorlando.locacao.mappers.LocacaoMapper;
@@ -10,10 +11,10 @@ import com.gabrielyorlando.locacao.models.enums.TipoLocacao;
 import com.gabrielyorlando.locacao.repositories.LocacaoRepository;
 import com.gabrielyorlando.locacao.repositories.ReservaRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,11 +24,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(MockitoExtension.class)
 public class LocacaoServiceTest {
     @Mock
     private LocacaoRepository locacaoRepository;
@@ -128,8 +129,6 @@ public class LocacaoServiceTest {
         assertDoesNotThrow(() -> locacaoService.delete(1L));
         verify(locacaoRepository, times(1)).deleteById(1L);
     }
-
-    // ---------- FALHAS ----------
 
     @Test
     void givenUnknownId_WhenFindById_thenThrowNotFound() {

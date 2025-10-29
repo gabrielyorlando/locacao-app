@@ -5,8 +5,6 @@ import com.gabrielyorlando.locacao.models.dtos.reserva.ReservaResponseDto;
 import com.gabrielyorlando.locacao.models.entities.Reserva;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel="spring")
 public interface ReservaMapper {

@@ -57,13 +57,20 @@ public class ReservaService {
             throw new BusinessRuleException("Não é possível alterar uma reserva cancelada");
         }
 
-        validator.validateDateRange(requestDto.getDataInicio(), requestDto.getDataFim());
+        if (requestDto.getDataInicio() == null && requestDto.getDataFim() == null) {
+            return reservaMapper.toResponseDTO(reservaExistente);
+        }
 
-        long minutes = calculateMinutes(requestDto.getDataInicio(), requestDto.getDataFim());
+        LocalDateTime novoInicio = requestDto.getDataInicio() != null ? requestDto.getDataInicio() : reservaExistente.getDataInicio();
+        LocalDateTime novoFim = requestDto.getDataFim() != null ? requestDto.getDataFim() : reservaExistente.getDataFim();
+
+        validator.validateDateRange(novoInicio, novoFim);
+
+        long minutes = calculateMinutes(novoInicio, novoFim);
         Locacao locacao = validateReservationUpdate(reservaExistente, requestDto, minutes);
 
-        reservaExistente.setDataInicio(requestDto.getDataInicio());
-        reservaExistente.setDataFim(requestDto.getDataFim());
+        reservaExistente.setDataInicio(novoInicio);
+        reservaExistente.setDataFim(novoFim);
         reservaExistente.setValorFinal(calculateTotal(locacao, minutes));
 
         return reservaMapper.toResponseDTO(reservaRepository.save(reservaExistente));
