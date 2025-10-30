@@ -34,8 +34,8 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.6")
     implementation("org.springframework.security:spring-security-oauth2-jose:6.5.6")
 
-    // implementation("org.flywaydb:flyway-core")
-    // implementation("org.flywaydb:flyway-mysql")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-mysql")
 
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
@@ -45,7 +45,7 @@ dependencies {
 
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:$lombokBindingVersion")
 
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.2.0")
+    runtimeOnly("com.mysql:mysql-connector-j:8.3.0")
 
     testImplementation("org.mockito:mockito-core:5.11.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
