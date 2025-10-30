@@ -40,8 +40,10 @@ public class LocacaoController {
 	}
 
 	@GetMapping("/availables")
-	public Page<LocacaoResponseDto> findAllAvailable(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-													 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end, Pageable pageable) {
+	public Page<LocacaoResponseDto> findAllAvailable(
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime start,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime end,
+			Pageable pageable) {
 		return locacaoService.findAvailableBetweenDates(start, end, pageable);
 	}
 

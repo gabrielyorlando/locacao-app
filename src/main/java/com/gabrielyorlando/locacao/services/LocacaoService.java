@@ -10,6 +10,9 @@ import com.gabrielyorlando.locacao.models.entities.Locacao;
 import com.gabrielyorlando.locacao.repositories.LocacaoRepository;
 import com.gabrielyorlando.locacao.repositories.ReservaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,10 +27,12 @@ public class LocacaoService {
 	private final LocacaoRepository locacaoRepository;
 	private final ReservaRepository reservaRepository;
 	private final LocacaoMapper locacaoMapper;
+	private final CacheManager cacheManager;
 
 	public LocacaoResponseDto save(LocacaoRequestDto requestDto) {
 		Locacao locacao = locacaoMapper.toEntity(requestDto);
 		Locacao saved = locacaoRepository.save(locacao);
+		invalidateCache();
 		return locacaoMapper.toResponseDTO(saved);
 	}
 
@@ -43,6 +48,7 @@ public class LocacaoService {
 		return locacaoRepository.findAll().stream().map(locacaoMapper::toResponseDTO).toList();
 	}
 
+	@Cacheable(value = "availableLocacoes", key = "{#start, #end, #pageable.pageNumber, #pageable.pageSize}")
 	@Transactional(readOnly = true)
 	public Page<LocacaoResponseDto> findAvailableBetweenDates(LocalDateTime start, LocalDateTime end, Pageable pageable) {
 		Page<Locacao> page = locacaoRepository.findAvailableByDateRangeAndSituacaoReservaConfirmada(start, end, pageable);
@@ -56,6 +62,7 @@ public class LocacaoService {
 		locacaoMapper.updateEntity(requestDto, locacaoExistente);
 
 		Locacao updated = locacaoRepository.save(locacaoExistente);
+		invalidateCache();
 		return locacaoMapper.toResponseDTO(updated);
 	}
 
@@ -67,6 +74,13 @@ public class LocacaoService {
 			throw new BusinessRuleException("Não é possível excluir a locação pois existem outros registros vinculados a ela.");
 		}
 		locacaoRepository.deleteById(id);
+		invalidateCache();
 	}
 
+	private void invalidateCache() {
+		Cache cache = cacheManager.getCache("availableLocacoes");
+		if(cache != null) {
+			cache.clear();
+		}
+	}
 }
