@@ -10,11 +10,14 @@ import com.gabrielyorlando.locacao.models.entities.Locacao;
 import com.gabrielyorlando.locacao.models.enums.TipoLocacao;
 import com.gabrielyorlando.locacao.repositories.LocacaoRepository;
 import com.gabrielyorlando.locacao.repositories.ReservaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -39,8 +42,17 @@ public class LocacaoServiceTest {
     @Mock
     private LocacaoMapper locacaoMapper;
 
+    @Mock
+    private CacheManager cacheManager;
+
     @InjectMocks
     private LocacaoService locacaoService;
+
+    @BeforeEach
+    void setup() {
+        Cache cacheMock = mock(Cache.class);
+        lenient().when(cacheManager.getCache(anyString())).thenReturn(cacheMock);
+    }
 
     @Test
     void givenValidRequest_WhenSave_thenReturnLocacao() {
