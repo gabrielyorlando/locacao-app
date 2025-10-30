@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.3
+    container_name: mysql-locacao
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: locacao-app
+      TZ: America/Sao_Paulo
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - locacao-net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: locacao-app
+    depends_on:
+      - mysql
+    ports:
+      - "9090:9090"
+    networks:
+      - locacao-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/locacao-app
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      TZ: America/Sao_Paulo
+
+volumes:
+  mysql-data:
+
+networks:
+  locacao-net:
+    driver: bridge
